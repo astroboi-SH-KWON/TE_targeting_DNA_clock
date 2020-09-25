@@ -27,7 +27,7 @@ FILTERED_CDS_INFO = "filtered_hg38_refFlat.txt"
 INIT = ['TE_trgt', 'NGG', 20, [10, 10]]
 
 TOTAL_CPU = mp.cpu_count()
-MULTI_CNT = int(TOTAL_CPU*0.7)
+MULTI_CNT = int(TOTAL_CPU*0.5)
 ############### end setting env #################
 
 def split_file_step_0():
@@ -55,6 +55,7 @@ def multi_step_1():
             pool = mp.Pool(processes=MULTI_CNT)
 
             pool_list = pool.map(get_trgt, splited_dfam_list)
+            pool.close()
 
             result_list = logic_prep.merge_multi_list(pool_list)
 

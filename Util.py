@@ -58,6 +58,7 @@ class Utils:
             sheet.cell(row=row, column=(col + idx), value=data_arr[idx])
 
     def make_excel(self, path, header, data_list, strt_idx=0):
+        print("start make_excel :", path)
         workbook = openpyxl.Workbook()
         sheet = workbook.active
 
@@ -69,8 +70,10 @@ class Utils:
             self.make_excel_row(sheet, row, data_arr[strt_idx:])
 
         workbook.save(filename=path + self.ext_xlsx)
+        print("end make_excel :", path, "\n")
 
     def make_csv(self, path, header, data_list, strt_idx=0, deli=','):
+        print("start make_csv :", path)
         with open(path, 'w') as f:
             tmp_head = ''
             for head in header[strt_idx:]:
@@ -82,6 +85,7 @@ class Utils:
                 for row_val in data_arr[strt_idx:]:
                     tmp_row += (str(row_val) + deli)
                 f.write(tmp_row[:-1] + "\n")
+        print("end make_csv :", path, "\n")
 
     """
     :param
