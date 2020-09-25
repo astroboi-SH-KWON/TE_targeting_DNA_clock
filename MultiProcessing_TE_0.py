@@ -18,8 +18,7 @@ if SYSTEM_NM == 'Linux':
 else:
     # DEV
     REF_DIR = "D:/000_WORK/000_reference_path/human/hg38/Splited/"
-    DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 14
-    # DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"
+    DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 55
 
 PROJECT_NAME = WORK_DIR.split("/")[-2]
 FILTERED_CDS_INFO = "filtered_hg38_refFlat.txt"
@@ -28,18 +27,18 @@ FILTERED_CDS_INFO = "filtered_hg38_refFlat.txt"
 INIT = ['TE_trgt', 'NGG', 20, [10, 10]]
 
 TOTAL_CPU = mp.cpu_count()
-MULTI_CNT = int(TOTAL_CPU*0.8)
+MULTI_CNT = int(TOTAL_CPU*0.7)
 ############### end setting env #################
 
 def split_file_step_0():
     util = Util.Utils()
-    util.split_big_file_to_files(DFAM_ANNO, 14, 400000)  # nrph
+    util.split_big_file_to_files(DFAM_ANNO, 55, 100000)  # nrph
 
 def multi_step_1():
     util = Util.Utils()
     logic_prep = LogicPrep.LogicPreps()
 
-    fl_cnt = 14
+    fl_cnt = 55
     fl_nm_cnt = 0
     for fl_num in range(fl_cnt):
         dfam_info = util.read_csv_ignore_N_line(DFAM_ANNO + str(fl_num), '\t', 0)
