@@ -22,3 +22,8 @@ class LogicPreps:
             else:
                 result_dict.update({tmp_key: [dfam_arr]})
         return result_dict
+
+    def merge_multi_list(self, pool_list):
+        result_list = []
+        for split_list in pool_list:
+            result_list.extend(split_list)

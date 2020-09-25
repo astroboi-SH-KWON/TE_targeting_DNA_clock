@@ -71,7 +71,7 @@ class Utils:
         workbook.save(filename=path + self.ext_xlsx)
 
     def make_csv(self, path, header, data_list, strt_idx=0, deli=','):
-        with open(path, 'a') as f:
+        with open(path, 'w') as f:
             tmp_head = ''
             for head in header[strt_idx:]:
                 tmp_head += (head + deli)

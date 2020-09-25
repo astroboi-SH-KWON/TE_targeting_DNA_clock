@@ -18,7 +18,7 @@ if SYSTEM_NM == 'Linux':
 else:
     # DEV
     REF_DIR = "D:/000_WORK/000_reference_path/human/hg38/Splited/"
-    DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 13
+    DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 14
     # DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"
 
 PROJECT_NAME = WORK_DIR.split("/")[-2]
@@ -33,79 +33,37 @@ MULTI_CNT = int(TOTAL_CPU*0.8)
 
 def split_file_step_0():
     util = Util.Utils()
-    util.split_big_file_to_files(DFAM_ANNO, 13, 400000)  # nrph
-    # util.split_big_file_to_files(DFAM_ANNO, 296, 400000)  # 309 with unapproved chromosome
-
-def step_1():
-    util = Util.Utils()
-    logic_prep = LogicPrep.LogicPreps()
-
-    fl_num = 0
-    dfam_info = util.read_csv_ignore_N_line(DFAM_ANNO + str(fl_num), '\t', 0)
-
-    # if SYSTEM_NM != 'Linux':
-    #     dfam_info = dfam_info[:10]
-
-    dfam_dict = logic_prep.make_list_to_dict_by_ele_as_key(dfam_info, 0)
-
-    # splited_dfam_list = np.array_split(dfam_info, MULTI_CNT)
-    #
-    # print("platform.system() : ", SYSTEM_NM)
-    # print("total cpu_count : ", str(TOTAL_CPU))
-    # print("will use : ", str(MULTI_CNT))
-    # pool = mp.Pool(processes=MULTI_CNT)
-    #
-    # pool_list = pool.map(get_trgt, splited_dfam_list)
-
-    header = ['chr', 'tot_seq', 'fam_nm', 'index', 'strand', 'trns_flag']
-    for key, val_list in dfam_dict.items():
-        result_list = get_trgt(val_list)
-        util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key, header, result_list)
+    util.split_big_file_to_files(DFAM_ANNO, 14, 400000)  # nrph
 
 def multi_step_1():
     util = Util.Utils()
     logic_prep = LogicPrep.LogicPreps()
 
-    fl_num = 0
-    dfam_info = util.read_csv_ignore_N_line(DFAM_ANNO + str(fl_num), '\t', 0)
+    fl_cnt = 14
+    for fl_num in range(fl_cnt):
+        dfam_info = util.read_csv_ignore_N_line(DFAM_ANNO + str(fl_num), '\t', 0)
 
-    # if SYSTEM_NM != 'Linux':
-    #     dfam_info = dfam_info[:10]
+        dfam_dict = logic_prep.make_list_to_dict_by_ele_as_key(dfam_info, 0)
 
-    dfam_dict = logic_prep.make_list_to_dict_by_ele_as_key(dfam_info, 0)
+        header = ['chr', 'tot_seq', 'fam_nm', 'index', 'strand', 'trns_flag']
+        for key, val_list in dfam_dict.items():
+            splited_dfam_list = np.array_split(val_list, MULTI_CNT)
 
-    header = ['chr', 'tot_seq', 'fam_nm', 'index', 'strand', 'trns_flag']
-    for key, val_list in dfam_dict.items():
-        splited_dfam_list = np.array_split(val_list, MULTI_CNT)
+            print("platform.system() : ", SYSTEM_NM)
+            print("total cpu_count : ", str(TOTAL_CPU))
+            print("will use : ", str(MULTI_CNT))
+            pool = mp.Pool(processes=MULTI_CNT)
 
-        print("platform.system() : ", SYSTEM_NM)
-        print("total cpu_count : ", str(TOTAL_CPU))
-        print("will use : ", str(MULTI_CNT))
-        pool = mp.Pool(processes=MULTI_CNT)
+            pool_list = pool.map(get_trgt, splited_dfam_list)
 
-        pool_list = pool.map(get_trgt, splited_dfam_list)
+            result_list = logic_prep.sort_list_by_ele(logic_prep.merge_multi_list(pool_list), 0)
 
-        result_list = logic_prep.sort_list_by_ele(logic_prep.merge_multi_list(pool_list), 0)
+            util.make_csv(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key + ".txt", header, result_list, 0, '\t')
+            try:
+                util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key, header, result_list)
+            except Exception as err:
+                print("util.make_excel :", str(err))
 
-        util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key, header, result_list)
-
-"""
-0 #seq_name	
-1 family_acc	
-2 family_name	
-3 bits	
-4 e-value	
-5 bias	
-6 hmm-st	
-7 hmm-en	
-8 strand	
-9 ali-st	
-0 ali-en	
-1 env-st 11	
-2 env-en 12	
-3 sq-len	
-4 kimura_div
-"""
 def get_trgt(dfam_list):
     def_nm = "get_trgt"
     print("multi_processing >>>", def_nm)
@@ -215,6 +173,5 @@ if __name__ == '__main__':
     start_time = time.perf_counter()
     print("start [ " + PROJECT_NAME + " ]>>>>>>>>>>>>>>>>>>")
     # split_file_step_0()
-    # step_1()
     multi_step_1()
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))
