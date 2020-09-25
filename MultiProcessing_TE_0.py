@@ -57,7 +57,7 @@ def multi_step_1():
 
             pool_list = pool.map(get_trgt, splited_dfam_list)
 
-            result_list = logic_prep.sort_list_by_ele(logic_prep.merge_multi_list(pool_list), 0)
+            result_list = logic_prep.merge_multi_list(pool_list)
 
             util.make_csv(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt) + ".txt", header, result_list, 0, '\t')
             try:

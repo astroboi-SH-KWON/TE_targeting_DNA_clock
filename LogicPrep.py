@@ -27,3 +27,4 @@ class LogicPreps:
         result_list = []
         for split_list in pool_list:
             result_list.extend(split_list)
+        return result_list

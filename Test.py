@@ -69,8 +69,8 @@ def multi_step_1():
     fl_num = 0
     dfam_info = util.read_csv_ignore_N_line(DFAM_ANNO + str(fl_num), '\t', 0)
 
-    # if SYSTEM_NM != 'Linux':
-    #     dfam_info = dfam_info[:10]
+    if SYSTEM_NM != 'Linux':
+        dfam_info = dfam_info[:100]
 
     dfam_dict = logic_prep.make_list_to_dict_by_ele_as_key(dfam_info, 0)
 
@@ -84,8 +84,8 @@ def multi_step_1():
         pool = mp.Pool(processes=MULTI_CNT)
 
         pool_list = pool.map(get_trgt, splited_dfam_list)
-
-        result_list = logic_prep.sort_list_by_ele(logic_prep.merge_multi_list(pool_list), 0)
+        result_list = logic_prep.merge_multi_list(pool_list)
+        print(type(result_list))
 
         util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key, header, result_list)
 
