@@ -60,10 +60,10 @@ def multi_step_1():
             result_list = logic_prep.merge_multi_list(pool_list)
 
             util.make_csv(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt) + ".txt", header, result_list, 0, '\t')
-            try:
-                util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt), header, result_list)
-            except Exception as err:
-                print("util.make_excel :", str(err))
+            # try:
+            #     util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt), header, result_list)
+            # except Exception as err:
+            #     print("util.make_excel :", str(err))
             fl_nm_cnt += 1
 
 def get_trgt(dfam_list):
