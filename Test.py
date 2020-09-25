@@ -18,7 +18,7 @@ if SYSTEM_NM == 'Linux':
 else:
     # DEV
     REF_DIR = "D:/000_WORK/000_reference_path/human/hg38/Splited/"
-    DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 13
+    DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 14
     # DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"
 
 PROJECT_NAME = WORK_DIR.split("/")[-2]
@@ -33,7 +33,7 @@ MULTI_CNT = int(TOTAL_CPU*0.8)
 
 def split_file_step_0():
     util = Util.Utils()
-    util.split_big_file_to_files(DFAM_ANNO, 13, 400000)  # nrph
+    util.split_big_file_to_files(DFAM_ANNO, 14, 400000)  # nrph
     # util.split_big_file_to_files(DFAM_ANNO, 296, 400000)  # 309 with unapproved chromosome
 
 def step_1():

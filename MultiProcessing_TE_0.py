@@ -40,6 +40,7 @@ def multi_step_1():
     logic_prep = LogicPrep.LogicPreps()
 
     fl_cnt = 14
+    fl_nm_cnt = 0
     for fl_num in range(fl_cnt):
         dfam_info = util.read_csv_ignore_N_line(DFAM_ANNO + str(fl_num), '\t', 0)
 
@@ -58,11 +59,12 @@ def multi_step_1():
 
             result_list = logic_prep.sort_list_by_ele(logic_prep.merge_multi_list(pool_list), 0)
 
-            util.make_csv(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key + ".txt", header, result_list, 0, '\t')
+            util.make_csv(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt) + ".txt", header, result_list, 0, '\t')
             try:
-                util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key, header, result_list)
+                util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt), header, result_list)
             except Exception as err:
                 print("util.make_excel :", str(err))
+            fl_nm_cnt += 1
 
 def get_trgt(dfam_list):
     def_nm = "get_trgt"
