@@ -1,4 +1,5 @@
 import glob
+from Bio import SeqIO
 import openpyxl
 
 class Utils:
@@ -16,6 +17,27 @@ class Utils:
     """
     def get_files_from_dir(self, path):
         return glob.glob(path)
+
+    def split_big_file_to_files(self, big_f, num_split, max_row):
+        # filter out unapproved chromosome
+        file_nm_arr = ['chrX', 'chrY']
+        for f_num in range(1, 23):
+            file_nm_arr.append("chr" + str(f_num))
+
+        with open(big_f) as input_f:
+            for num in range(num_split):
+                with open(big_f + str(num), 'w') as out_f:
+                    cnt = 0
+                    for tmp_line in input_f:
+
+                        # filter out unapproved chromosome
+                        if tmp_line.split('\t')[0] not in file_nm_arr:
+                            continue
+
+                        cnt += 1
+                        out_f.write(tmp_line)
+                        if cnt == max_row:
+                            break
 
     def read_csv_ignore_N_line(self, path, deli_str=",", n_line=1):
         result_list = []
@@ -60,3 +82,12 @@ class Utils:
                 for row_val in data_arr[strt_idx:]:
                     tmp_row += (str(row_val) + deli)
                 f.write(tmp_row[:-1] + "\n")
+
+    """
+    :param
+        path : file path with ext
+        f_format : file format (ex : fasta, genbank...)
+    """
+    def read_file_by_biopython(self, path, f_format):
+        seq_record = SeqIO.read(path, f_format)
+        return str(seq_record.seq).upper(), str(seq_record.seq.complement()).upper()

@@ -1,4 +1,3 @@
-import re
 
 class LogicPreps:
 
@@ -13,3 +12,13 @@ class LogicPreps:
         for tmp_arr in sorted(data_list, key=lambda tmp_arr: tmp_arr[ele_idx], reverse=up_down_flag):
             result_list.append(tmp_arr)
         return result_list
+
+    def make_list_to_dict_by_ele_as_key(self, dfam_list, ele_key):
+        result_dict = {}
+        for dfam_arr in dfam_list:
+            tmp_key = dfam_arr[ele_key]
+            if tmp_key in result_dict:
+                result_dict[tmp_key].append(dfam_arr)
+            else:
+                result_dict.update({tmp_key: [dfam_arr]})
+        return result_dict
