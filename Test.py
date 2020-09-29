@@ -211,10 +211,25 @@ def get_trgt(dfam_list):
     print("DONE multi_processing >>>", def_nm)
     return result_list
 
+def test():
+    util = Util.Utils()
+    cds_info = util.read_csv_ignore_N_line(WORK_DIR + "input/" + FILTERED_CDS_INFO, "\t")
+    real_pos_st = 89223770
+    real_pos_en = 89223793
+    for cds_arr in cds_info:
+        if 'chr8' != cds_arr[2]:
+            continue
+
+        trns_st = int(cds_arr[4])
+        trns_en = int(cds_arr[5])
+        if trns_st < real_pos_st and real_pos_en < trns_en:
+            print("here")
+
 if __name__ == '__main__':
     start_time = time.perf_counter()
     print("start [ " + PROJECT_NAME + " ]>>>>>>>>>>>>>>>>>>")
     # split_file_step_0()
     # step_1()
-    multi_step_1()
+    # multi_step_1()
+    test()
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))

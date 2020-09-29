@@ -27,7 +27,7 @@ FILTERED_CDS_INFO = "filtered_hg38_refFlat.txt"
 INIT = ['TE_trgt', 'NGG', 20, [10, 10]]
 
 TOTAL_CPU = mp.cpu_count()
-MULTI_CNT = int(TOTAL_CPU*0.5)
+MULTI_CNT = int(TOTAL_CPU*0.8)
 ############### end setting env #################
 
 def split_file_step_0():
@@ -47,6 +47,7 @@ def multi_step_1():
 
         header = ['chr', 'tot_seq', 'fam_nm', 'index', 'strand', 'trns_flag']
         for key, val_list in dfam_dict.items():
+            print(key, ":key of dfam_dict")
             splited_dfam_list = np.array_split(val_list, MULTI_CNT)
 
             print("platform.system() : ", SYSTEM_NM)
@@ -60,10 +61,11 @@ def multi_step_1():
             result_list = logic_prep.merge_multi_list(pool_list)
 
             util.make_csv(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt) + ".txt", header, result_list, 0, '\t')
-            # try:
-            #     util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt), header, result_list)
-            # except Exception as err:
-            #     print("util.make_excel :", str(err))
+            try:
+                util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_nm_cnt), header, result_list)
+            except Exception as err:
+                print("util.make_excel :", str(err))
+                continue
             fl_nm_cnt += 1
 
 def get_trgt(dfam_list):
@@ -133,6 +135,9 @@ def get_trgt(dfam_list):
 
                 trns_flag = False
                 for cds_arr in cds_info:
+                    if chr_nm != cds_arr[2]:
+                        continue
+
                     gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
@@ -158,6 +163,9 @@ def get_trgt(dfam_list):
 
                 trns_flag = False
                 for cds_arr in cds_info:
+                    if chr_nm != cds_arr[2]:
+                        continue
+
                     gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
