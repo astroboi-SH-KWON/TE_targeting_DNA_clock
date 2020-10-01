@@ -62,12 +62,12 @@ def main_TE_1_fl1_by_1():
             trgt_fl[:trgt_fl.index("TE_trgt_")] + "loop/" + trgt_fl[trgt_fl.index("TE_trgt_"):].replace(".txt", "") + ".fl1_by_1", header, result_list, 0, '\t')
 
 def main_TE_1_fl_n_by_1():
-    n = 3
+    n = 10
     util = Util.Utils()
     header = ['sequence', '#duple', '#trnscprt',
               'chromosome:23bp(spacer + PAM)index range:strand:transcription:fam_name']
 
-    fl_sources = util.get_files_from_dir(WORK_DIR + "output/loop/TE_trgt_cyc2_*")
+    fl_sources = util.get_files_from_dir(WORK_DIR + "output/loop/TE_trgt_*.fl1_by_1")
 
     last_epoch = len(fl_sources) % n
     epoch = math.ceil(len(fl_sources)/n)
@@ -108,7 +108,7 @@ def main_TE_1_fl_n_by_1():
                 tmp_str += tmp_val + ", "
             result_list.append([res_key, len(val_set), cnt_trpt, tmp_str])
 
-        util.make_csv(trgt_fl[:trgt_fl.index("TE_trgt_")] + "TE_trgt_cyc3_" + str(i) + "_fl" + str(n) + "_by_1", header,
+        util.make_csv(trgt_fl[:trgt_fl.index("TE_trgt_")] + "TE_trgt_cyc1_" + str(i) + "_fl" + str(n) + "_by_1", header,
                       result_list, 0, '\t')
 
 def main_TE_1_fl_n_by_1_w_array():
@@ -197,14 +197,19 @@ def split_TE_1_fl_n_by_1_right_away():
               'chromosome:23bp(spacer + PAM)index range:strand:transcription:fam_name']
 
     fl_nm_f = WORK_DIR + "output/loop/TE_trgt_cyc"
+    cyc_num = 3
     fl_nm_b = "_fln_by_1"
 
+    res_f_num = 0
+
+    # tm_arr = [[1, 2, 3, 5], [0, 4, 6, 7]]
+    # tm_arr = [[0, 3], [1, 2]]
     tm_arr = [[0, 2]]
     for i_a in range(len(tm_arr)):
         result_dict = {}
         for i in tm_arr[i_a]:
-            print(fl_nm_f + "6_" + str(i) + fl_nm_b)
-            with open(fl_nm_f + "6_" + str(i) + fl_nm_b) as f:
+            print(fl_nm_f + str(cyc_num) + "_" + str(i) + fl_nm_b)
+            with open(fl_nm_f + str(cyc_num) + "_" + str(i) + fl_nm_b) as f:
                 print(f.readline())
                 while True:
                     tmp_line = f.readline().replace("\n", "")
@@ -233,10 +238,16 @@ def split_TE_1_fl_n_by_1_right_away():
             else:
                 result1_list.append([res_key, len(val_set), cnt_trpt, tmp_str])
 
+        result_dict.clear()
         sorted_result0_list = logic_prep.sort_list_by_ele(result0_list, 1)
+        result0_list.clear()
 
-        util.make_csv(fl_nm_f + "7_0_fln_by_1", header, sorted_result0_list, 0, '\t')
-        util.make_csv(fl_nm_f + "7_1_fln_by_1", header, result1_list, 0, '\t')
+        util.make_csv(fl_nm_f + str(cyc_num + 1) + "_" + str(res_f_num) + "_fln_by_1", header, sorted_result0_list, 0, '\t')
+        res_f_num += 1
+        util.make_csv(fl_nm_f + str(cyc_num + 1) + "_" + str(res_f_num) + "_fln_by_1", header, result1_list, 0, '\t')
+        res_f_num += 1
+        sorted_result0_list.clear()
+        result1_list.clear()
 
 def multi_processing_TE_1_fl_n_by_1():
     num_proc = 7
@@ -255,7 +266,7 @@ def multi_processing_TE_1_fl_n_by_1():
             print(j)
 
 def split_file():
-    big_f = WORK_DIR + "output/loop/TE_trgt_cyc7_0_fln_by_1"
+    big_f = WORK_DIR + "output/loop/TE_trgt_cyc4_0_fln_by_1"
     num_split = 30
     max_row = 1000
     cnt_f = 0
@@ -272,12 +283,14 @@ def split_file():
                     if cnt == max_row:
                         break
             if cnt_f == 0:
-                max_row = 2000
-            elif cnt_f < 2:
+                max_row = 1000
+            # elif cnt_f < 3:
+            #     max_row = 20000
+            elif cnt_f < 3:
                 max_row = 20000
-            elif cnt_f < 5:
+            elif cnt_f < 7:
                 max_row = 40000
-            elif cnt_f < 8:
+            elif cnt_f < 10:
                 max_row = 150000
             else:
                 max_row = 800000
