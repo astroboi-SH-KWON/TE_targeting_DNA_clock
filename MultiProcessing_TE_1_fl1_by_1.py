@@ -268,8 +268,7 @@ def multi_processing_TE_1_fl_n_by_1():
 def split_file():
     big_f = WORK_DIR + "output/loop/TE_trgt_cyc4_0_fln_by_1"
     num_split = 30
-    max_row = 1000
-    cnt_f = 0
+    max_row = 600
 
     with open(big_f) as input_f:
         header = input_f.readline()
@@ -282,19 +281,24 @@ def split_file():
                     out_f.write(tmp_line)
                     if cnt == max_row:
                         break
-            if cnt_f == 0:
-                max_row = 1000
-            # elif cnt_f < 3:
-            #     max_row = 20000
-            elif cnt_f < 3:
-                max_row = 20000
-            elif cnt_f < 7:
-                max_row = 40000
-            elif cnt_f < 10:
-                max_row = 150000
+            if num == 0:
+                max_row = 2000
+            elif num == 1:
+                max_row = 10000
+            elif num == 2:
+                max_row = 30000
+            elif num == 3:
+                max_row = 80000
+            elif num == 4:
+                max_row = 170000
+            elif num == 5:
+                max_row = 300000
+            elif num == 6:
+                max_row = 450000
+            elif num < 10:
+                max_row = 600000
             else:
                 max_row = 800000
-            cnt_f += 1
 
 
 if __name__ == '__main__':
