@@ -300,6 +300,34 @@ def split_file():
             else:
                 max_row = 800000
 
+def make_excel_w_max_row():
+    util = Util.Utils()
+    max_row = 1000000
+    big_f = WORK_DIR + "output/loop/TE_trgt_cyc4_0_fln_by_1"
+    with open(big_f) as input_f:
+        header = input_f.readline().replace("\n", "").split("\t")
+        num = 0
+
+        while True:
+            result_list = []
+            flag = False
+            while True:
+                if len(result_list) == max_row:
+                    util.make_excel(WORK_DIR + "output/loop/TE_trgt_" + str(num), header, result_list)
+                    num += 1
+                    break
+                tmp_line = input_f.readline()
+                if tmp_line == '':
+                    util.make_excel(WORK_DIR + "output/loop/TE_trgt_" + str(num), header, result_list)
+                    flag = True
+                    break
+                result_list.append(tmp_line.replace("\n", "").split("\t"))
+
+            if flag:
+                break
+
+
+
 
 if __name__ == '__main__':
     start_time = time.perf_counter()
@@ -309,6 +337,7 @@ if __name__ == '__main__':
     # main_TE_1_fl_n_by_1_w_array()
     # main_TE_1_fl_n_by_1_right_away()
     # split_TE_1_fl_n_by_1_right_away()
-    split_file()
+    # split_file()
+    make_excel_w_max_row()
     # multi_processing_TE_1_fl_n_by_1()
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))
