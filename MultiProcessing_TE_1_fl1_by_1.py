@@ -249,6 +249,86 @@ def split_TE_1_fl_n_by_1_right_away():
         sorted_result0_list.clear()
         result1_list.clear()
 
+
+def make_ACGT_NN():
+    util = Util.Utils()
+    logic_prep = LogicPrep.LogicPreps()
+    logic = Logic.Logics()
+
+    if SYSTEM_NM == 'Linux':
+        # REAL
+        big_f = WORK_DIR + "output/loop/TE_trgt_cyc4_0_fln_by_1"
+    else:
+        # DEV
+        big_f = WORK_DIR + "output/loop/TE_trgt_0_fl3_by_1"
+
+    len_f_win = 10
+    len_spacer = 20
+    len_b_win = 10
+
+    ngg_arr = ['AGG', 'GGG', 'TGG', 'CGG']
+
+    header = ['spacer (20 bp)']
+    for tmp_str in ngg_arr:
+        header.append(tmp_str + ' %')
+    header.extend(['#duple', '#trscprt'])
+
+    result_dict = {}
+    with open(big_f) as f:
+        f.readline()  # ignore first line
+        while True:
+            tmp_line = f.readline()
+            if tmp_line == '':
+                break
+            tmp_arr = tmp_line.replace("\n", "").split("\t")
+            seq = tmp_arr[0]
+            num_dup = int(tmp_arr[1])
+            num_trpt = int(tmp_arr[2])
+
+            spacer_seq = seq[len_f_win: len_f_win + len_spacer]
+            pam_seq = seq[len_f_win + len_spacer: - len_b_win]
+
+            if not logic.match(0, pam_seq, 'NGG'):
+                print("wrong pam seq :", pam_seq)
+                print(str(tmp_arr))
+                continue
+
+            if spacer_seq in result_dict:
+                if pam_seq in result_dict[spacer_seq]:
+                    result_dict[spacer_seq][pam_seq][0] += num_dup
+                    result_dict[spacer_seq][pam_seq][1] += num_trpt
+                else:
+                    result_dict[spacer_seq].update({pam_seq: [num_dup, num_trpt]})
+            else:
+                result_dict.update({spacer_seq: {pam_seq: [num_dup, num_trpt]}})
+
+    result_list = []
+    for key, val_dict in result_dict.items():
+        tmp_list = [key]
+        n_dup = 0
+        n_trp = 0
+
+        for ngg_str in ngg_arr:
+            if ngg_str in val_dict:
+                n_dup += val_dict[ngg_str][0]
+                n_trp += val_dict[ngg_str][1]
+            else:
+                val_dict.update({ngg_str: [0, 0]})
+
+        for ngg_str in ngg_arr:
+            tmp_list.append(val_dict[ngg_str][0] * 100 / n_dup)
+        tmp_list.extend([n_dup, n_trp])
+        result_list.append(tmp_list)
+
+    util.make_csv(WORK_DIR + "output/TE_trgt_AGTC_NN", header, result_list, 0, '\t')
+    try:
+        util.make_excel(WORK_DIR + "output/TE_trgt_AGTC_NN", header, result_list, 0)
+    except Exception as err:
+        print(err)
+
+
+
+
 def multi_processing_TE_1_fl_n_by_1():
     num_proc = 7
 
@@ -338,6 +418,7 @@ if __name__ == '__main__':
     # main_TE_1_fl_n_by_1_right_away()
     # split_TE_1_fl_n_by_1_right_away()
     # split_file()
-    make_excel_w_max_row()
+    # make_excel_w_max_row()
+    make_ACGT_NN()
     # multi_processing_TE_1_fl_n_by_1()
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))
