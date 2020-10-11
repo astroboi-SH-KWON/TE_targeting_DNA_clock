@@ -320,12 +320,15 @@ def make_ACGT_NN():
         tmp_list.extend([n_dup, n_trp])
         result_list.append(tmp_list)
 
-    util.make_csv(WORK_DIR + "output/TE_trgt_AGTC_NN", header, result_list, 0, '\t')
+    result_dict.clear()
+    sorted_list = logic_prep.sort_list_by_ele(result_list, 5)
+    result_list.clear()
+    util.make_csv(WORK_DIR + "output/TE_trgt_AGTC_NN", header, sorted_list, 0, '\t')
     try:
-        util.make_excel(WORK_DIR + "output/TE_trgt_AGTC_NN", header, result_list, 0)
+        util.make_excel(WORK_DIR + "output/TE_trgt_AGTC_NN", header, sorted_list, 0)
     except Exception as err:
         print(err)
-
+    sorted_list.clear()
 
 
 
