@@ -69,3 +69,8 @@ class Logics:
             return self.match(i + 1, seq_str, rule_str)
         else:
             return False
+
+    def is_N_in_seq(self, t_seq):
+        if "N" in t_seq:
+            return True
+        return False
