@@ -120,6 +120,7 @@ def get_trgt(dfam_list):
             real_pos_st = env_st + i
             real_pos_en = env_st + i + len_spacer + len_pam
 
+            # check + strand
             if logic.match(0, p_pam, pam_seq):
                 spacer = trgt_p_seq[i: i + len_spacer]
 
@@ -148,6 +149,7 @@ def get_trgt(dfam_list):
 
                 result_list.append([chr_nm, tot_seq, fam_nm, str(real_pos_st) + "-" + str(real_pos_en), '+', trns_flag])
 
+            # check - strand
             if logic.match(0, m_pam, pam_seq[::-1]):
                 spacer = trgt_m_seq[i + len_pam: i + len_pam + len_spacer]
 
