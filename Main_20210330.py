@@ -1,8 +1,8 @@
 import time
 import os
-from Bio import SeqIO
+# from Bio import SeqIO
 import multiprocessing as mp
-import numpy as np
+# import numpy as np
 import platform
 
 import Util
@@ -75,7 +75,10 @@ def get_guide_seq_idx_strnd_trns_flg(te_inf_arr, cds_info, result_list):
         if logic.match(0, p_pam, pam_rule):
             spacer = trgt_p_seq[i: i + len_spacer]
 
-            f_win_seq = trgt_p_seq[i - len_f_win: i]
+            tmp_idx = i - len_b_win
+            if tmp_idx < 0:
+                tmp_idx = 0
+            f_win_seq = trgt_p_seq[tmp_idx: i]
             if len(f_win_seq) < len_f_win:
                 f_win_seq = p_trgt_seq_f[-(len_f_win - len(f_win_seq)):] + f_win_seq
 
@@ -91,7 +94,7 @@ def get_guide_seq_idx_strnd_trns_flg(te_inf_arr, cds_info, result_list):
                     if chr_nm != cds_arr[2]:
                         continue
 
-                    gen_sym = cds_arr[0]
+                    # gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
                     trns_en = int(cds_arr[5])
@@ -109,7 +112,10 @@ def get_guide_seq_idx_strnd_trns_flg(te_inf_arr, cds_info, result_list):
             if len(f_win_seq) < len_f_win:
                 f_win_seq += m_trgt_seq_f[: len_f_win - len(f_win_seq)]
 
-            b_win_seq = trgt_m_seq[i - len_b_win: i]
+            tmp_idx = i - len_b_win
+            if tmp_idx < 0:
+                tmp_idx = 0
+            b_win_seq = trgt_m_seq[tmp_idx: i]
             if len(b_win_seq) < len_b_win:
                 b_win_seq = m_trgt_seq_b[- (len_b_win - len(b_win_seq)):] + b_win_seq
 
@@ -121,7 +127,7 @@ def get_guide_seq_idx_strnd_trns_flg(te_inf_arr, cds_info, result_list):
                     if chr_nm != cds_arr[2]:
                         continue
 
-                    gen_sym = cds_arr[0]
+                    # gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
                     trns_en = int(cds_arr[5])
@@ -130,6 +136,47 @@ def get_guide_seq_idx_strnd_trns_flg(te_inf_arr, cds_info, result_list):
                         break
 
                 result_list.append([chr_nm, tot_seq, fam_nm, str(real_pos_st) + "-" + str(real_pos_en), '-', trns_flag])
+
+
+def test(trgt_num):
+    util = Util.Utils()
+    with open(WORK_DIR + IN + TE_info_fl.replace(".txt", "") + "/Genome_TandemRepeat_TRD_" + str(trgt_num) + ".txt", 'r') as f:
+        cds_inf = util.read_csv_ignore_N_line(WORK_DIR + IN + FILTERED_CDS_INFO, "\t")
+        result_list = []
+        # print(f.readline().replace("\n", ""))
+        cnt = 0
+        while True:
+            cnt += 1
+            tmp_line = f.readline().replace("\n", "")
+            if tmp_line == "":
+                break
+            # if SYSTEM_NM != 'Linux':
+            #     # DEV
+            #     if cnt == 1000:
+            #         break
+            te_info_arr = tmp_line.split("\t")
+
+            get_guide_seq_idx_strnd_trns_flg(te_info_arr, cds_inf, result_list)
+
+        header = ['chr', 'tot_seq', 'fam_nm', 'index', 'strand', 'trns_flag']
+        util.make_csv(WORK_DIR + OU + "TE_trgt_20210330_" + str(trgt_num) + ".txt", header, result_list, 0, '\t')
+
+
+def test2(trgt_num):
+    util = Util.Utils()
+    tmp_data = [['181898940', '146368184', '146368217', '4', '8.500000', '94', '0', '0', '58', '0', '41', '50', '1.000000', '1.000000', '34', 'chr5', 'ttgagatggagatttgctcttgtcgtccaggctggagtgcaatggcacagtctcagctcactgcaacctctgcctcccaggttcaagcgattctcctgcctcagcttcccaagCTGTTGAAACTTTCCTGTGACTCATGGTCTGTGTAGGGTTGTCCTTTGATGGTACCATGCCCTACTGAGACCTATACTGAACACAGTGTGGAGTGGCTAGGACAGCACTGGGCAGCTCCAGGGCCCTGGGAAGTGGAGGAGAATGTTCTTTTGAGGATTGATTATTCAGTCAGTCAGAAACACTTGctgagtagccaggattataggcacccaccaccacgcccggctaatttttgtatttttagtagagaaggggtttcaccatattggctaggctggcctcgaactcctgacctcaggtgatctacccgctttggcctcccaaagtgctgggattacaggcatgagccaccacacTGGCCTCCCGATGTTAAATAAGCCAGCCAG', 'CCTT', 'CCTTCCTTCCTTCCTTCCCTCCTTCCCTCCTTCC', 'ATTTTACTTTCTTTCCTTCCAAACAGGTGAGGAAAAGAATGACTTTGCCAAAGCAAATAGGCAACTTTGAAATGTCAAGTGCATGACAATAACACATTGTTCAGCTCTCTGCTTCTCAGAGGACGTATTTCATCATAAGGCCAAACCAGTTAGTCAGATGCCAAGAAGTGATAGCAAGCACAGTTTATAGTTCAAGAAACCATGCAAGGAAGGAGAAAAAGTTGAGATGAAAAAGAAGCAAATACTGAAAAGTTAAGCTTGAGTATGCTGGGACCAATCACTGAACTAAGCTAGAAGAGAATTTTGAGCTTCTCATTCTCTTGACTACCTGATTTGAAAGCCCAAACCTATCAGAGGAGCCTGATCCTTAATGTGGATTATTATTTTATAAATTATTAAGAAGGGCAATATCTCTCCATTTACTGAATGTCATAACAAAAGAGATAGGAGGGAAACCAAGACATTGTCTACCCAAAGAGCCCCGCATTTGGACAGTGTAA', '29622334', '--']
+                , ['181245620', '146370721', '146370759', '12', '3.000000', '92', '7', '17', '20', '46', '15', '51', '0.393939', '0.062500', '39', 'chr1', 'AATGGGGAAGATTTTATCTTCCTGGAGTCCTAAGCCACTAATTTGTGACTTATCCATGTCAAGGGCCAGCCCACCTCCCCGACCGGATTCTTAACCGGGTATCTCCTGAAATCCTGGGTTTATACGTGTGTAACTCAGGAATCCTGAAACAGAGACCTAGGAACCCACTTCTGGTGTGATAAAATTCTAATTCAGTCCGTTATACGCTTAAACGAGTAATTTACATGCCTCCATTTTTTCATATTTTAATAATAGGAGGTCAGTAATATCCCCAGGATGTGCCTGGATTTACTGATTGCTCTATCAATAATGTGACCAGTGGAATCATTCATCATCATAGTGATCCTCTCCATCATTTTTGAAAAGAGTATTTTTCCTCAGTTTGTGCATGATTTATTTAACCCTTTTCAAAATGTTTTTGttagccaggcatggtggcatgtgcctgtaatcccaggtacttgggattctgaggcaggagaatcatttgaacctgggag', 'GTGGAGGCTGCA', 'GTGGAGGCTGCAGTGGAGGCTGCACCAGTGGAGGCTGCA', 'ctgctacactcccacctgggcaacagagcgagactccatctcaaaaaaaaaataaaaataaaaaaataaaGTTTTTGAGATGaggtaggtttcattgttttaggattacaaagaatgctgcagccacctttcttgtacacatatctttgGTCATTGTGGAAATGTCTACACCGCAGATATTTCTATAGTGTAGGGAAGTTGATGCACTATTGCTACATTATAGGGTTTACATGATGCTTGTAATTTGAGTACATTCTGCAAATGTATCTTTCACGGGAGCCGTACCAAATAATATTCCAATAGCaatatttataggaggaaaaatgtgcagaagtgcaattgagcttcgtgcctctccatggggcccatgttcataaaatggtggcattagcaatcatctgagagtggagtttgtggccctctgacatcaaaagctgaagcagaggacatgaaaaccctcactgtgcatcctctctagtctggccagaatcattcctagg', '29622330', '--']
+                , ['181245621', '146370731', '146370760', '15', '2.000000', '100', '0', '20', '26', '40', '13', '60', '0.212121', '0.212121', '30', 'chr1', 'ATTTTATCTTCCTGGAGTCCTAAGCCACTAATTTGTGACTTATCCATGTCAAGGGCCAGCCCACCTCCCCGACCGGATTCTTAACCGGGTATCTCCTGAAATCCTGGGTTTATACGTGTGTAACTCAGGAATCCTGAAACAGAGACCTAGGAACCCACTTCTGGTGTGATAAAATTCTAATTCAGTCCGTTATACGCTTAAACGAGTAATTTACATGCCTCCATTTTTTCATATTTTAATAATAGGAGGTCAGTAATATCCCCAGGATGTGCCTGGATTTACTGATTGCTCTATCAATAATGTGACCAGTGGAATCATTCATCATCATAGTGATCCTCTCCATCATTTTTGAAAAGAGTATTTTTCCTCAGTTTGTGCATGATTTATTTAACCCTTTTCAAAATGTTTTTGttagccaggcatggtggcatgtgcctgtaatcccaggtacttgggattctgaggcaggagaatcatttgaacctgggaggtggaggctg', 'CAGTGGAGGCTGCAC', 'CAGTGGAGGCTGCACCAGTGGAGGCTGCAC', 'tgctacactcccacctgggcaacagagcgagactccatctcaaaaaaaaaataaaaataaaaaaataaaGTTTTTGAGATGaggtaggtttcattgttttaggattacaaagaatgctgcagccacctttcttgtacacatatctttgGTCATTGTGGAAATGTCTACACCGCAGATATTTCTATAGTGTAGGGAAGTTGATGCACTATTGCTACATTATAGGGTTTACATGATGCTTGTAATTTGAGTACATTCTGCAAATGTATCTTTCACGGGAGCCGTACCAAATAATATTCCAATAGCaatatttataggaggaaaaatgtgcagaagtgcaattgagcttcgtgcctctccatggggcccatgttcataaaatggtggcattagcaatcatctgagagtggagtttgtggccctctgacatcaaaagctgaagcagaggacatgaaaaccctcactgtgcatcctctctagtctggccagaatcattcctaggt', '29622330', '--']
+                , ['181245622', '146376705', '146376729', '10', '2.500000', '100', '0', '0', '0', '92', '8', '50', '1.000000', '1.000000', '25', 'chr1', 'CTTTCATTTCATAAATATGGTTTCTCTCTGACATTGAACGGCTTCCAATTTCAAGCGGAATGCTACATGACAAGGATAAGGATGTGAAGAGAACCGGTTTCTTTTGTAATCCTAAACGTTCTCGTCTGAGAATTAAAAGCCATTATTTGAAGAACGGTGCCCAGGCTCCAGCTGGCCACCGAAAGGTTGCTCCGCAGCGCAGGCTAAGGACCAGCTTCTTCGGGCGAGAACAGATGCCGGGGCGGGAGGGAAAAAGGGAGAGACAGACGTCACTTCCCCCTGCCGGCTCCGGCAGCGGGTTGGTAGGCTGAGCGGCAGAAAGGCAGACGGGGACTGGGAAAGGCACTGTCGGTGACATCACGGATAGGGCGACTTCTATGTAAATGAGGCAGCGCAGGGGCTGCTGCTTCGCCACGAAGGATTTCCCGTGCCGTGGGAGCGGGTTCAGGACCGCTGGTCGGACCTGAGAGTCCCAGCTGTGTGTGAGGGCTAggagggct', 'GGGGGTGGGG', 'GGGGGTGGGGGGGGGTGGGGGGGGG', 'gggtgcgcggggCAAGTGACCGTGCGTGTAAAGGGTGAAGCGTGTGAGGCTGTGGCGGGGCGGAGGTGCAAAAGCTCatacttacctggcaggggagataccatgatcacgaaggtggttttcccagggcgaggcttatccattgcactccggatgtgctgacccctgcgatttccccaaatgtgggaaactcgactgcataatttgtggtagtgggggactgcgttcgcgctttcccctgATTTTTGTAGTTTAAAGAACAGTCTGCACGGCGAGGGTTACTTGTTTTTTTTACTGGCTTGTGCTTTACTCTTAATCGTTTCTCTCACAGTCGGAGGTTGAGGAATAGTAGTAATATGTCGCTTTCTCCCCGCCTCGGGAGAAATAAGAAGCGTCGACCTTTACACAAGCTAGCTAGCGCGAAGGCCGCACAGCTCTTCCTTTATCTACGCGGGGCTGCTTTTTGCAGAGATTTGTCTGTCCATGGTCTGCAGTCTCTT', '29622330', '--']
+                ]
+    with open(WORK_DIR + IN + "/test.txt", "w") as f:
+        for tmp_arr in tmp_data:
+            tmp_str = ""
+            for tmp_val in tmp_arr:
+                tmp_str += tmp_val + "\t"
+            f.write(tmp_str[:-1] + "\n")
+    # sources = util.get_files_from_dir(WORK_DIR + IN + TE_info_fl.replace(".txt", "") + "/Genome_TandemRepeat_TRD*.txt")
+    # print(sources[trgt_num])
 
 
 def main():
@@ -159,5 +206,8 @@ def main():
 if __name__ == '__main__':
     start_time = time.perf_counter()
     print("start [ " + PROJECT_NAME + " ]>>>>>>>>>>>>>>>>>>")
-    main()
+    # main()
+    # for i in [843, 94]:
+    #     test(i)
+    test(1)
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))

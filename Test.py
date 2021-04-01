@@ -1,6 +1,6 @@
 import time
 import os
-from Bio import SeqIO
+# from Bio import SeqIO
 import multiprocessing as mp
 import numpy as np
 import platform
@@ -31,10 +31,12 @@ TOTAL_CPU = mp.cpu_count()
 MULTI_CNT = int(TOTAL_CPU*0.8)
 ############### end setting env #################
 
+
 def split_file_step_0():
     util = Util.Utils()
     util.split_big_file_to_files(DFAM_ANNO, 14, 400000)  # nrph
     # util.split_big_file_to_files(DFAM_ANNO, 296, 400000)  # 309 with unapproved chromosome
+
 
 def step_1():
     util = Util.Utils()
@@ -61,6 +63,7 @@ def step_1():
     for key, val_list in dfam_dict.items():
         result_list = get_trgt(val_list)
         util.make_excel(WORK_DIR + "output/TE_trgt_" + str(fl_num) + "_" + key, header, result_list)
+
 
 def multi_step_1():
     util = Util.Utils()
@@ -158,10 +161,14 @@ def get_trgt(dfam_list):
             real_pos_st = env_st + i
             real_pos_en = env_st + i + len_spacer + len_pam
 
+            # check + strand
             if logic.match(0, p_pam, pam_seq):
                 spacer = trgt_p_seq[i: i + len_spacer]
 
-                f_win_seq = trgt_p_seq[i - len_f_win: i]
+                tmp_idx = i - len_b_win
+                if tmp_idx < 0:
+                    tmp_idx = 0
+                f_win_seq = trgt_p_seq[tmp_idx: i]
                 if len(f_win_seq) < len_f_win:
                     f_win_seq = p_trgt_seq_f[-(len_f_win - len(f_win_seq)):] + f_win_seq
 
@@ -173,7 +180,7 @@ def get_trgt(dfam_list):
 
                 trns_flag = False
                 for cds_arr in cds_info:
-                    gen_sym = cds_arr[0]
+                    # gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
                     trns_en = int(cds_arr[5])
@@ -183,6 +190,7 @@ def get_trgt(dfam_list):
 
                 result_list.append([chr_nm, tot_seq, fam_nm, str(real_pos_st) + "-" + str(real_pos_en), '+', trns_flag])
 
+            # check - strand
             if logic.match(0, m_pam, pam_seq[::-1]):
                 spacer = trgt_m_seq[i + len_pam: i + len_pam + len_spacer]
 
@@ -190,7 +198,10 @@ def get_trgt(dfam_list):
                 if len(f_win_seq) < len_f_win:
                     f_win_seq += m_trgt_seq_f[: len_f_win - len(f_win_seq)]
 
-                b_win_seq = trgt_m_seq[i - len_b_win: i]
+                tmp_idx = i - len_b_win
+                if tmp_idx < 0:
+                    tmp_idx = 0
+                b_win_seq = trgt_m_seq[tmp_idx: i]
                 if len(b_win_seq) < len_b_win:
                     b_win_seq = m_trgt_seq_b[- (len_b_win - len(b_win_seq)):] + b_win_seq
 
@@ -198,7 +209,7 @@ def get_trgt(dfam_list):
 
                 trns_flag = False
                 for cds_arr in cds_info:
-                    gen_sym = cds_arr[0]
+                    # gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
                     trns_en = int(cds_arr[5])
@@ -210,6 +221,7 @@ def get_trgt(dfam_list):
 
     print("DONE multi_processing >>>", def_nm)
     return result_list
+
 
 def test():
     util = Util.Utils()
@@ -225,11 +237,20 @@ def test():
         if trns_st < real_pos_st and real_pos_en < trns_en:
             print("here")
 
+
+def test_1000():
+    path = "D:/000_WORK/ParkJiHye/20210330/Human Full Genome_TandemRepeat_TRD_20210330.txt"
+
+    with open(path, 'r') as f:
+        for i in range(10):
+            print(f.readline().replace("\n", ""))
+
+
 if __name__ == '__main__':
     start_time = time.perf_counter()
     print("start [ " + PROJECT_NAME + " ]>>>>>>>>>>>>>>>>>>")
     # split_file_step_0()
     # step_1()
     # multi_step_1()
-    test()
+    test_1000()
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))

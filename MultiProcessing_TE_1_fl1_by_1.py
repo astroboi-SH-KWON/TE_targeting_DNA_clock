@@ -21,9 +21,11 @@ else:
     REF_DIR = "D:/000_WORK/000_reference_path/human/hg38/Splited/"
     DFAM_ANNO = "D:/000_WORK/ParkJiHye/20200914/hg38_dfam.nrph.hits"  # 55
 
+os.makedirs(WORK_DIR + "/output/loop/", exist_ok=True)
 PROJECT_NAME = WORK_DIR.split("/")[-2]
 ############### end setting env #################
 
+# very first
 def main_TE_1_fl1_by_1():
     util = Util.Utils()
     header = ['sequence', '#duple', '#trnscprt', 'chromosome:23bp(spacer + PAM)index range:strand:transcription:fam_name']
@@ -61,6 +63,7 @@ def main_TE_1_fl1_by_1():
         util.make_csv(
             trgt_fl[:trgt_fl.index("TE_trgt_")] + "loop/" + trgt_fl[trgt_fl.index("TE_trgt_"):].replace(".txt", "") + ".fl1_by_1", header, result_list, 0, '\t')
 
+# the second with input file from "very first" main_TE_1_fl1_by_1()
 def main_TE_1_fl_n_by_1():
     n = 10
     util = Util.Utils()
@@ -415,13 +418,15 @@ def make_excel_w_max_row():
 if __name__ == '__main__':
     start_time = time.perf_counter()
     print("start [ " + PROJECT_NAME + " ]>>>>>>>>>>>>>>>>>>")
-    # main_TE_1_fl1_by_1()
+    # # very first
+    main_TE_1_fl1_by_1()
     # main_TE_1_fl_n_by_1()
     # main_TE_1_fl_n_by_1_w_array()
     # main_TE_1_fl_n_by_1_right_away()
     # split_TE_1_fl_n_by_1_right_away()
     # split_file()
     # make_excel_w_max_row()
-    make_ACGT_NN()
+    # # very last
+    # make_ACGT_NN()
     # multi_processing_TE_1_fl_n_by_1()
     print("::::::::::: %.2f seconds ::::::::::::::" % (time.perf_counter() - start_time))

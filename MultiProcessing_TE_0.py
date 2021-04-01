@@ -30,9 +30,11 @@ TOTAL_CPU = mp.cpu_count()
 MULTI_CNT = int(TOTAL_CPU*0.8)
 ############### end setting env #################
 
+
 def split_file_step_0():
     util = Util.Utils()
     util.split_big_file_to_files(DFAM_ANNO, 55, 100000)  # nrph
+
 
 def multi_step_1():
     util = Util.Utils()
@@ -67,6 +69,7 @@ def multi_step_1():
                 print("util.make_excel :", str(err))
                 continue
             fl_nm_cnt += 1
+
 
 def get_trgt(dfam_list):
     def_nm = "get_trgt"
@@ -124,7 +127,10 @@ def get_trgt(dfam_list):
             if logic.match(0, p_pam, pam_seq):
                 spacer = trgt_p_seq[i: i + len_spacer]
 
-                f_win_seq = trgt_p_seq[i - len_f_win: i]
+                tmp_idx = i - len_b_win
+                if tmp_idx < 0:
+                    tmp_idx = 0
+                f_win_seq = trgt_p_seq[tmp_idx: i]
                 if len(f_win_seq) < len_f_win:
                     f_win_seq = p_trgt_seq_f[-(len_f_win - len(f_win_seq)):] + f_win_seq
 
@@ -139,7 +145,7 @@ def get_trgt(dfam_list):
                     if chr_nm != cds_arr[2]:
                         continue
 
-                    gen_sym = cds_arr[0]
+                    # gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
                     trns_en = int(cds_arr[5])
@@ -157,7 +163,10 @@ def get_trgt(dfam_list):
                 if len(f_win_seq) < len_f_win:
                     f_win_seq += m_trgt_seq_f[: len_f_win - len(f_win_seq)]
 
-                b_win_seq = trgt_m_seq[i - len_b_win: i]
+                tmp_idx = i - len_b_win
+                if tmp_idx < 0:
+                    tmp_idx = 0
+                b_win_seq = trgt_m_seq[tmp_idx: i]
                 if len(b_win_seq) < len_b_win:
                     b_win_seq = m_trgt_seq_b[- (len_b_win - len(b_win_seq)):] + b_win_seq
 
@@ -168,7 +177,7 @@ def get_trgt(dfam_list):
                     if chr_nm != cds_arr[2]:
                         continue
 
-                    gen_sym = cds_arr[0]
+                    # gen_sym = cds_arr[0]
                     # nm_id = cds_arr[1]
                     trns_st = int(cds_arr[4])
                     trns_en = int(cds_arr[5])
@@ -180,6 +189,7 @@ def get_trgt(dfam_list):
 
     print("DONE multi_processing >>>", def_nm)
     return result_list
+
 
 if __name__ == '__main__':
     start_time = time.perf_counter()
